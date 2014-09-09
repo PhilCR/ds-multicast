@@ -38,7 +38,7 @@ public class Server implements Runnable{
             while(true)  
             { 
                 socket = serverSocket.accept();
-                new echoThread(socket).start();
+                new EchoThread(socket).start();
             } 
         } 
         catch (IOException e)  
@@ -53,11 +53,11 @@ public class Server implements Runnable{
 
     }
     
-    public class echoThread extends Thread {
+    public class EchoThread extends Thread {
 
         protected Socket socket;
 
-        public echoThread(Socket socket) {
+        public EchoThread(Socket socket) {
             this.socket = socket;
         }
 
