@@ -27,12 +27,12 @@ public class Client implements Runnable{
     @Override
     public void run() {
         try {
-            Socket socket = new Socket("127.0.0.1", 6000);
+            Socket socket = new Socket("127.0.0.1", 52000);
             DataOutputStream ostream = new DataOutputStream(socket.getOutputStream());  
             DataInputStream istream = new DataInputStream(socket.getInputStream());
 
             
-            ostream.writeUTF(pid + "|" + clock + "|" + "SEND");  
+            ostream.writeUTF(pid + "-" + clock + "-" + "SEND");  
             ostream.flush();  
 
             System.out.println(pid + ": Enviando");

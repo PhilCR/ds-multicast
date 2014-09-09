@@ -9,6 +9,8 @@ package multicastordenado;
 import java.io.*;
 import java.net.*;
 import java.util.LinkedList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -32,32 +34,14 @@ public class Server implements Runnable{
         
     
         try {
-            serverSocket = new ServerSocket(6000);
-            socket = serverSocket.accept();
-            DataOutputStream ostream = new   
-            DataOutputStream(socket.getOutputStream());  
-            DataInputStream istream = new   
-            DataInputStream(socket.getInputStream());  
-  
+           serverSocket = new ServerSocket(52000);
             while(true)  
             { 
-                String message = istream.readUTF();  
-                String[] tuples = message.split("|");
-                
-                // Confirms if its a ACK
-                if ( tuples[2] == "ACK" ){
-                    
-                }else{
-                    queue.add(tuples);
-                    //Lamport's timestamp algorithm
-                    clock = Integer.max(Integer.parseInt(tuples[0]), clock) +1;
-                    ostream.writeUTF(pid + "|" + clock + "|" + "ACK");
-                    ostream.flush();
-                    System.out.println(pid + "|" + clock + "|" + "ACK");
-                }
+                socket = serverSocket.accept();
+                new echoThread(socket).start();
             } 
         } 
-        catch (Exception e)  
+        catch (IOException e)  
         { System.err.println("Fechando conexão") ;
            System.err.println(e.toString());
           if  (socket != null)  
@@ -69,5 +53,42 @@ public class Server implements Runnable{
 
     }
     
-    
+    public class echoThread extends Thread {
+
+        protected Socket socket;
+
+        public echoThread(Socket socket) {
+            this.socket = socket;
+        }
+
+        @Override
+        public void run() {
+            try{
+                DataOutputStream ostream = new DataOutputStream(socket.getOutputStream());
+                DataInputStream istream = new DataInputStream(socket.getInputStream());
+
+                
+                String message = istream.readUTF();
+                String[] tuples = message.split("-");
+
+                // Confirms if its a ACK
+                if ("ACK".equals(tuples[2])) {
+                    System.out.println("Confirmando ACK");
+                } else {
+                    queue.add(tuples);
+                    System.out.println(tuples[0] + "-" + tuples[1] + "-" + tuples[2]);
+                    //Lamport's timestamp algorithm
+                    clock = Integer.max(Integer.parseInt(tuples[0]), clock) + 1;
+                    ostream.writeUTF(pid + "-" + clock + "-" + "ACK");
+                    ostream.flush();
+                    System.out.println(pid + "-" + clock + "-" + "ACK");
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+            
+        }
+
+    }
 }
