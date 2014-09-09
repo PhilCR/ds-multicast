@@ -6,15 +6,9 @@
 
 package multicastordenado;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.Socket;
+import java.io.*;
+import java.net.*;
 import java.util.LinkedList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -33,17 +27,19 @@ public class Client implements Runnable{
     @Override
     public void run() {
         try {
-            Socket client = new Socket("127.0.0.1", 6000);
-            PrintWriter out = new PrintWriter(client.getOutputStream(), true);
-            BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
-            BufferedReader stdIn;
-            stdIn = new BufferedReader(new InputStreamReader(System.in));
-        } catch (IOException ex) {
-            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        
+            Socket socket = new Socket("127.0.0.1", 6000);
+            DataOutputStream ostream = new DataOutputStream(socket.getOutputStream());  
+            DataInputStream istream = new DataInputStream(socket.getInputStream());
+
+            
+            ostream.writeUTF(pid + "|" + clock + "|" + "SEND");  
+            ostream.flush();  
+
+            System.out.println(pid + ": Enviando");
+
+        } catch(Exception e){ 
+            System.err.println(e);  
+        }         
     }
-    
-    
+   
 }
